@@ -2,7 +2,6 @@
 
 Job Rush is a high-performance, full-stack recruitment platform designed to bridge the gap between talented candidates and top-tier recruiters. Built with a focus on visual excellence and seamless user experience, it offers a robust suite of tools for job posting, application tracking, and AI-driven candidate engagement.
 
-![Project Preview](https://via.placeholder.com/1200x600?text=Job+Rush+Platform+Preview)
 
 ## ✨ Key Features
 
@@ -35,7 +34,7 @@ Job Rush is a high-performance, full-stack recruitment platform designed to brid
 - **Framework**: Express.js
 - **Database**: MySQL
 - **Auth**: JWT (JSON Web Tokens), BCrypt.js
-- **Communication**: Nodemailer, Brevo (Email Service)
+- **Communication**:Brevo (Email Service)
 - **File Handling**: Multer
 
 ---
@@ -68,10 +67,6 @@ DB_NAME=job_portal
 JWT_SECRET=your_secret_key
 BREVO_API_KEY=your_brevo_key
 EMAIL_USER=your_email
-```
-- Import the database schema:
-```bash
-mysql -u your_user -p job_portal < schema.sql
 ```
 - Start the server:
 ```bash
