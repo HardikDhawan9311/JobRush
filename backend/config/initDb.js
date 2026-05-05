@@ -1,4 +1,6 @@
 const mysql = require('mysql2/promise');
+const fs = require('fs');
+const path = require('path');
 require('dotenv').config();
 
 const initDb = async () => {
@@ -105,7 +107,32 @@ const initDb = async () => {
     await db.query(createJobsTable);
     await db.query(createApplicationsTable);
     await db.query(createSavedJobsTable);
-    console.log('Tables checked/initialized successfully.');
+
+    // 3. Ensure recruiter columns exist in users table (Migration for existing databases)
+    const [columns] = await db.query('SHOW COLUMNS FROM users');
+    const columnNames = columns.map(c => c.Field);
+    
+    if (!columnNames.includes('company_name')) {
+      await db.query('ALTER TABLE users ADD COLUMN company_name VARCHAR(120)');
+      console.log('Added company_name column to users table');
+    }
+    if (!columnNames.includes('company_website')) {
+      await db.query('ALTER TABLE users ADD COLUMN company_website VARCHAR(255)');
+      console.log('Added company_website column to users table');
+    }
+    if (!columnNames.includes('company_logo')) {
+      await db.query('ALTER TABLE users ADD COLUMN company_logo VARCHAR(255)');
+      console.log('Added company_logo column to users table');
+    }
+
+    // 4. Ensure uploads directory exists
+    const uploadsDir = path.join(__dirname, '..', 'uploads');
+    if (!fs.existsSync(uploadsDir)) {
+      fs.mkdirSync(uploadsDir, { recursive: true });
+      console.log('Created uploads directory');
+    }
+
+    console.log('Tables and directories initialized successfully.');
     await db.end();
 
   } catch (err) {

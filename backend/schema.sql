@@ -18,6 +18,9 @@ CREATE TABLE IF NOT EXISTS users (
     experience VARCHAR(50),
     location VARCHAR(100),
     bio TEXT,
+    company_name VARCHAR(150),
+    company_website VARCHAR(255),
+    company_logo VARCHAR(255),
 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
