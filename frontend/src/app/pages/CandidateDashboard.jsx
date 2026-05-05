@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Upload, FileText, Briefcase, Heart, Clock, CheckCircle2, XCircle, Calendar, User, Settings, Eye } from "lucide-react";
 import { Link, useNavigate } from "react-router";
-import axios from "axios";
+import api from "../utils/api";
 
 export function CandidateDashboard() {
   const navigate = useNavigate();
@@ -16,11 +16,7 @@ export function CandidateDashboard() {
   }, []);
 
   const fetchUserData = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/user/profile`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get("/user/profile");
       setUser(res.data);
     } catch (err) {
       console.error("Error fetching user data:", err);
@@ -29,10 +25,7 @@ export function CandidateDashboard() {
 
   const fetchApplications = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/jobs/applications`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get("/jobs/applications");
       setApplications(res.data);
     } catch (err) {
       console.error("Error fetching applications:", err);

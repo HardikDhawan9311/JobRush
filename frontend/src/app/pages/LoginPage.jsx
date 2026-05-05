@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router";
 import { Mail, Lock, Briefcase, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { useUser } from "../context/UserContext";
+import api from "../utils/api";
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -18,29 +19,26 @@ export function LoginPage() {
     setLoading(true);
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, otp: showOTP ? otp : undefined }),
+      const res = await api.post("/auth/login", {
+        email,
+        password,
+        otp: showOTP ? otp : undefined
       });
 
-      const data = await res.json();
+      const data = res.data;
 
-      if (res.ok) {
-        if (data.message === "OTP_SENT") {
-          setShowOTP(true);
-          toast.info("OTP sent to your email for recruiter verification");
-        } else {
-          localStorage.setItem("token", data.token);
-          updateUser(data.user);
-          toast.success("Login successful!");
-          navigate(data.user.role === "candidate" ? "/dashboard/candidate" : "/dashboard/recruiter");
-        }
+      if (data.message === "OTP_SENT") {
+        setShowOTP(true);
+        toast.info("OTP sent to your email for recruiter verification");
       } else {
-        toast.error(data.message || "Login failed");
+        localStorage.setItem("token", data.token);
+        updateUser(data.user);
+        toast.success("Login successful!");
+        navigate(data.user.role === "candidate" ? "/dashboard/candidate" : "/dashboard/recruiter");
       }
     } catch (err) {
-      toast.error("Connection error. Is backend running?");
+      const message = err.response?.data?.message || "Login failed. Please check your credentials.";
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -49,19 +47,11 @@ export function LoginPage() {
   const resendOTP = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-      if (res.ok) {
-        toast.success("A new OTP has been sent to your email");
-      } else {
-        const data = await res.json();
-        toast.error(data.message || "Failed to resend OTP");
-      }
+      await api.post("/auth/login", { email, password });
+      toast.success("A new OTP has been sent to your email");
     } catch (err) {
-      toast.error("Connection error");
+      const message = err.response?.data?.message || "Failed to resend OTP";
+      toast.error(message);
     } finally {
       setLoading(false);
     }

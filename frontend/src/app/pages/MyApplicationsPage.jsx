@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Briefcase, Clock, CheckCircle2, XCircle, Calendar, Eye, ArrowLeft, Search, Filter, MapPin } from "lucide-react";
 import { Link, useNavigate } from "react-router";
-import axios from "axios";
+import api from "../utils/api";
 import { motion } from "motion/react";
 
 export function MyApplicationsPage() {
@@ -19,10 +19,7 @@ export function MyApplicationsPage() {
 
   const fetchApplications = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/jobs/applications`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get("/jobs/applications");
       setApplications(res.data);
     } catch (err) {
       console.error("Error fetching applications:", err);
