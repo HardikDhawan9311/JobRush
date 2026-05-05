@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { Mail, Lock, User, Briefcase, Users, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
+import api from "../utils/api";
 
 
 export function SignupPage() {
@@ -21,20 +22,15 @@ export function SignupPage() {
     }
     setLoading(true);
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/send-otp`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-      const data = await res.json();
-      if (res.ok) {
+      const res = await api.post("/auth/send-otp", { email });
+      if (res.status === 200) {
         setShowOTP(true);
         toast.success("OTP sent to your email!");
       } else {
-        toast.error(data.message || "Failed to send OTP");
+        toast.error(res.data.message || "Failed to send OTP");
       }
     } catch (err) {
-      toast.error("Connection error. Is backend running?");
+      toast.error(err.response?.data?.message || "Connection error. Is backend running?");
     } finally {
       setLoading(false);
     }
@@ -49,29 +45,21 @@ export function SignupPage() {
 
     setLoading(true);
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/register`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          full_name: name,
-          email,
-          password,
-          role,
-          otp: role === "recruiter" ? otp : undefined,
-        }),
+      const res = await api.post("/auth/register", {
+        full_name: name,
+        email,
+        password,
+        role,
+        otp: role === "recruiter" ? otp : undefined,
       });
 
-      const data = await res.json();
-      if (res.ok) {
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify(data.user));
-        toast.success("Account created successfully!");
-        navigate(role === "candidate" ? "/dashboard/candidate" : "/dashboard/recruiter");
-      } else {
-        toast.error(data.message || "Signup failed");
-      }
+      const data = res.data;
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      toast.success("Account created successfully!");
+      navigate(role === "candidate" ? "/dashboard/candidate" : "/dashboard/recruiter");
     } catch (err) {
-      toast.error("Connection error");
+      toast.error(err.response?.data?.message || "Signup failed");
     } finally {
       setLoading(false);
     }

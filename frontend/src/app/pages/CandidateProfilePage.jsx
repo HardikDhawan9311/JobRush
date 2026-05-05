@@ -5,7 +5,7 @@ import {
   Download, ExternalLink, Calendar, CheckCircle2, 
   User, Code, GraduationCap, Award
 } from "lucide-react";
-import axios from "axios";
+import api, { getAssetUrl } from "../utils/api";
 import { toast } from "sonner";
 import { motion } from "motion/react";
 
@@ -21,10 +21,7 @@ export function CandidateProfilePage() {
 
   const fetchCandidateProfile = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/user/profile/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get(`/user/profile/${id}`);
       setCandidate(res.data);
     } catch (err) {
       console.error("Error fetching candidate profile:", err);
@@ -62,7 +59,7 @@ export function CandidateProfilePage() {
               <div className="flex flex-col items-center text-center">
                 <div className="w-32 h-32 rounded-3xl bg-gradient-to-br from-[#3b82f6]/20 to-[#ef4444]/20 flex items-center justify-center mb-6 border border-white/10 overflow-hidden shadow-2xl">
                   {candidate.profile_image ? (
-                    <img src={`${import.meta.env.VITE_API_URL}${candidate.profile_image}`} alt={candidate.full_name} className="w-full h-full object-cover" />
+                    <img src={getAssetUrl(candidate.profile_image)} alt={candidate.full_name} className="w-full h-full object-cover" />
                   ) : (
                     <User className="w-12 h-12 text-[#3b82f6]" />
                   )}
@@ -94,7 +91,7 @@ export function CandidateProfilePage() {
                   Documents
                 </h3>
                 <a 
-                  href={`${import.meta.env.VITE_API_URL}${candidate.resume_url}`} 
+                  href={getAssetUrl(candidate.resume_url)} 
                   target="_blank" 
                   rel="noreferrer"
                   className="w-full p-4 rounded-2xl bg-[#3b82f6] text-white flex items-center justify-center gap-3 hover:shadow-lg hover:shadow-[#3b82f6]/30 transition-all font-bold"

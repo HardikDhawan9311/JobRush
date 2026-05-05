@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router";
 import { MapPin, DollarSign, Briefcase, Heart, Upload, CheckCircle2, ArrowLeft, Loader2 } from "lucide-react";
-import axios from "axios";
+import api from "../utils/api";
 import { toast } from "sonner";
 
 export function JobDetailsPage() {
@@ -20,10 +20,7 @@ export function JobDetailsPage() {
 
   const fetchJobDetails = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/jobs/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get(`/jobs/${id}`);
       setJob(res.data);
     } catch (err) {
       console.error("Error fetching job details:", err);
@@ -35,10 +32,7 @@ export function JobDetailsPage() {
 
   const fetchUserProfile = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/user/profile`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get("/user/profile");
       setUser(res.data);
     } catch (err) {
       console.error("Error fetching user profile:", err);
@@ -54,10 +48,7 @@ export function JobDetailsPage() {
 
     setApplying(true);
     try {
-      const token = localStorage.getItem("token");
-      await axios.post(`${import.meta.env.VITE_API_URL}/jobs/${id}/apply`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.post(`/jobs/${id}/apply`, {});
       setJob(prev => ({ ...prev, hasApplied: true }));
       toast.success("Application submitted successfully!");
     } catch (err) {

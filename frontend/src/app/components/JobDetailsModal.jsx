@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { X, MapPin, DollarSign, Briefcase, Calendar, Users, CheckCircle2, XCircle, Clock, ExternalLink } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
-import axios from "axios";
+import api, { getAssetUrl } from "../utils/api";
 import { toast } from "sonner";
 
 export function JobDetailsModal({ job, applicants, isOpen, onClose, onStatusUpdate, fetchingApplicants }) {
@@ -10,11 +10,8 @@ export function JobDetailsModal({ job, applicants, isOpen, onClose, onStatusUpda
   const handleUpdateStatus = async (applicationId, newStatus) => {
     setUpdatingId(applicationId);
     try {
-      const token = localStorage.getItem("token");
-      // Note: We need to create this endpoint in the backend if we want it to work
-      await axios.put(`${import.meta.env.VITE_API_URL}/jobs/applications/${applicationId}/status`, 
-        { status: newStatus },
-        { headers: { Authorization: `Bearer ${token}` } }
+      await api.put(`/jobs/applications/${applicationId}/status`, 
+        { status: newStatus }
       );
       toast.success(`Application ${newStatus}`);
       if (onStatusUpdate) onStatusUpdate();
@@ -158,7 +155,7 @@ export function JobDetailsModal({ job, applicants, isOpen, onClose, onStatusUpda
                         <div className="flex items-center gap-4 mb-4">
                           <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#3b82f6]/20 to-[#ef4444]/20 flex items-center justify-center border border-white/10 overflow-hidden">
                             {applicant.profile_image ? (
-                              <img src={`${import.meta.env.VITE_API_URL}${applicant.profile_image}`} alt={applicant.full_name} className="w-full h-full object-cover" />
+                              <img src={getAssetUrl(applicant.profile_image)} alt={applicant.full_name} className="w-full h-full object-cover" />
                             ) : (
                               <Users className="w-6 h-6 text-[#3b82f6]" />
                             )}
@@ -185,7 +182,7 @@ export function JobDetailsModal({ job, applicants, isOpen, onClose, onStatusUpda
                         <div className="flex gap-2">
                           {applicant.resume_url ? (
                             <a 
-                              href={`${import.meta.env.VITE_API_URL}${applicant.resume_url}`} 
+                              href={getAssetUrl(applicant.resume_url)} 
                               target="_blank" 
                               rel="noreferrer"
                               className="flex-1 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-medium flex items-center justify-center gap-2 transition-all"

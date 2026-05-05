@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Search, MapPin, SlidersHorizontal, Loader2 } from "lucide-react";
 import { JobCard } from "../components/JobCard";
-import axios from "axios";
+import api from "../utils/api";
 import { toast } from "sonner";
 
 export function JobListingPage() {
@@ -24,16 +24,14 @@ export function JobListingPage() {
 
   const fetchJobs = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/jobs/all`, {
+      const res = await api.get("/jobs/all", {
         params: {
           title: searchQuery,
           location: locationQuery,
           jobType: filters.jobType.join(','),
           experience: filters.experience.join(','),
           maxSalary: filters.salaryRange[1]
-        },
-        headers: { Authorization: `Bearer ${token}` }
+        }
       });
       setJobs(res.data);
     } catch (err) {
@@ -46,10 +44,7 @@ export function JobListingPage() {
 
   const fetchSavedJobs = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/jobs/saved`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get("/jobs/saved");
       setSavedJobs(new Set(res.data.map(job => job.id)));
     } catch (err) {
       console.error("Error fetching saved jobs:", err);
@@ -58,10 +53,7 @@ export function JobListingPage() {
 
   const handleSave = async (jobId) => {
     try {
-      const token = localStorage.getItem("token");
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/jobs/${jobId}/save`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.post(`/jobs/${jobId}/save`, {});
       
       setSavedJobs(prev => {
         const newSet = new Set(prev);

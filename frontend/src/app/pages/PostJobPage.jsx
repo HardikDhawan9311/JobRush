@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Briefcase, MapPin, DollarSign, ArrowLeft, Send, Save } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router";
-import axios from "axios";
+import api from "../utils/api";
 import { toast } from "sonner";
 
 export function PostJobPage() {
@@ -38,10 +38,7 @@ export function PostJobPage() {
   const fetchJobDetails = async () => {
     setFetching(true);
     try {
-      const token = localStorage.getItem("token");
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/jobs/${editId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get(`/jobs/${editId}`);
       const job = res.data;
       setFormData({
         title: job.title || "",
@@ -69,17 +66,12 @@ export function PostJobPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      const token = localStorage.getItem("token");
       if (editId) {
-        await axios.put(`${import.meta.env.VITE_API_URL}/jobs/${editId}`, formData, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        await api.put(`/jobs/${editId}`, formData);
         toast.success("Job updated successfully!");
         navigate(`/dashboard/recruiter/jobs/${editId}`);
       } else {
-        await axios.post(`${import.meta.env.VITE_API_URL}/jobs`, formData, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        await api.post("/jobs", formData);
         toast.success("Job posted successfully!");
         navigate("/dashboard/recruiter");
       }

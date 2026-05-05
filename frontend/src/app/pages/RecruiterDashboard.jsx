@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Plus, Briefcase, Users, Eye, CheckCircle2, XCircle, Calendar, MapPin, DollarSign, Trash2 } from "lucide-react";
-import axios from "axios";
+import api from "../utils/api";
 import { toast } from "sonner";
 import { useNavigate, Link } from "react-router";
 
@@ -23,10 +23,7 @@ export function RecruiterDashboard() {
 
   const fetchRecruiterData = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/user/profile`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get("/user/profile");
       setUser(res.data);
     } catch (err) {
       console.error("Error fetching recruiter data:", err);
@@ -35,10 +32,7 @@ export function RecruiterDashboard() {
 
   const fetchJobs = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/jobs/recruiter`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get("/jobs/recruiter");
       setJobs(res.data);
     } catch (err) {
       console.error("Error fetching jobs:", err);
@@ -47,10 +41,7 @@ export function RecruiterDashboard() {
 
   const fetchStats = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/jobs/stats`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get("/jobs/stats");
       setStatsData(res.data);
     } catch (err) {
       console.error("Error fetching stats:", err);
@@ -64,10 +55,7 @@ export function RecruiterDashboard() {
   const handleDeleteJob = async (id) => {
     if (!window.confirm("Are you sure you want to delete this job?")) return;
     try {
-      const token = localStorage.getItem("token");
-      await axios.delete(`${import.meta.env.VITE_API_URL}/jobs/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.delete(`/jobs/${id}`);
       toast.success("Job deleted");
       fetchJobs();
       fetchStats();

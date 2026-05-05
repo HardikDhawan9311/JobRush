@@ -16,13 +16,13 @@ export function CandidateDashboard() {
   }, []);
 
   const fetchUserData = async () => {
+    try {
       const res = await api.get("/user/profile");
       setUser(res.data);
     } catch (err) {
       console.error("Error fetching user data:", err);
     }
   };
-
   const fetchApplications = async () => {
     try {
       const res = await api.get("/jobs/applications");

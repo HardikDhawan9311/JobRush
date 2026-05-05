@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Lock, Mail, ShieldCheck, ArrowRight, CheckCircle2, AlertCircle } from "lucide-react";
-import axios from "axios";
+import api from "../utils/api";
 import { toast } from "sonner";
 import { useNavigate } from "react-router";
 
@@ -17,7 +17,7 @@ export function ChangePasswordPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post(`${import.meta.env.VITE_API_URL}/auth/send-otp`, { email });
+      await api.post("/auth/send-otp", { email });
       toast.success("OTP sent to your email!");
       setStep(2);
     } catch (err) {
@@ -38,7 +38,7 @@ export function ChangePasswordPage() {
 
     setLoading(true);
     try {
-      await axios.post(`${import.meta.env.VITE_API_URL}/auth/update-password`, {
+      await api.post("/auth/update-password", {
         email,
         otp,
         newPassword

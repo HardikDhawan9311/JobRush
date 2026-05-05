@@ -13,7 +13,7 @@ import {
 import { useUser } from "../context/UserContext";
 
 import { useState, useEffect } from "react";
-import axios from "axios";
+import api, { getAssetUrl } from "../utils/api";
 
 export function Sidebar() {
   const location = useLocation();
@@ -22,11 +22,7 @@ export function Sidebar() {
   useEffect(() => {
     const fetchLatestUser = async () => {
       try {
-        const token = localStorage.getItem("token");
-        if (!token) return;
-        const res = await axios.get(`${import.meta.env.VITE_API_URL}/user/profile`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const res = await api.get("/user/profile");
         updateUser(res.data);
       } catch (err) {
         console.error("Error syncing user data:", err);
@@ -91,7 +87,7 @@ export function Sidebar() {
           <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/10">
             <div className="w-10 h-10 rounded-full bg-[#3b82f6]/20 flex items-center justify-center overflow-hidden border border-[#3b82f6]/30">
               {user.profile_image ? (
-                <img src={`${import.meta.env.VITE_API_URL}${user.profile_image}`} alt="Avatar" className="w-full h-full object-cover" />
+                <img src={getAssetUrl(user.profile_image)} alt="Avatar" className="w-full h-full object-cover" />
               ) : (
                 <User className="w-5 h-5 text-[#3b82f6]" />
               )}

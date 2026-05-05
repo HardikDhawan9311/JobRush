@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { X, Upload, Check, User, Mail, MapPin, Briefcase, FileText, Code } from "lucide-react";
-import axios from "axios";
+import api from "../utils/api";
 
 export function ProfileModal({ isOpen, onClose, onUpdate }) {
   const [formData, setFormData] = useState({
@@ -25,10 +25,7 @@ export function ProfileModal({ isOpen, onClose, onUpdate }) {
 
   const fetchProfile = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/user/profile`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get("/user/profile");
       setFormData({
         full_name: res.data.full_name || "",
         email: res.data.email || "",
@@ -58,10 +55,8 @@ export function ProfileModal({ isOpen, onClose, onUpdate }) {
     if (resumeFile) data.append("resume_url", resumeFile);
 
     try {
-      const token = localStorage.getItem("token");
-      await axios.put(`${import.meta.env.VITE_API_URL}/user/profile`, data, {
+      await api.put("/user/profile", data, {
         headers: { 
-          Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data"
         }
       });

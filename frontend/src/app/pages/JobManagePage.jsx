@@ -5,7 +5,7 @@ import {
   Users, Clock, CheckCircle2, XCircle, ExternalLink, Mail, Phone, Eye,
   ChevronLeft, ChevronRight, Download
 } from "lucide-react";
-import axios from "axios";
+import api, { getAssetUrl } from "../utils/api";
 import { toast } from "sonner";
 import { motion } from "motion/react";
 
@@ -26,10 +26,7 @@ export function JobManagePage() {
 
   const fetchJobDetails = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/jobs/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get(`/jobs/${id}`);
       setJob(res.data);
     } catch (err) {
       console.error("Error fetching job:", err);
@@ -39,10 +36,7 @@ export function JobManagePage() {
 
   const fetchApplicants = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/jobs/${id}/applicants`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get(`/jobs/${id}/applicants`);
       setApplicants(res.data);
     } catch (err) {
       console.error("Error fetching applicants:", err);
@@ -53,10 +47,8 @@ export function JobManagePage() {
 
   const handleUpdateStatus = async (applicationId, newStatus) => {
     try {
-      const token = localStorage.getItem("token");
-      await axios.put(`${import.meta.env.VITE_API_URL}/jobs/applications/${applicationId}/status`, 
-        { status: newStatus },
-        { headers: { Authorization: `Bearer ${token}` } }
+      await api.put(`/jobs/applications/${applicationId}/status`, 
+        { status: newStatus }
       );
       toast.success(`Application marked as ${newStatus}`);
       fetchApplicants();
@@ -79,7 +71,7 @@ export function JobManagePage() {
       a.email,
       a.location || "N/A",
       a.status,
-      a.resume_url ? `${import.meta.env.VITE_API_URL}${a.resume_url}` : "N/A"
+      a.resume_url ? getAssetUrl(a.resume_url) : "N/A"
     ]);
 
     const csvContent = [
@@ -100,10 +92,7 @@ export function JobManagePage() {
   const handleDeleteJob = async () => {
     if (!window.confirm("Are you sure you want to delete this job? This action cannot be undone.")) return;
     try {
-      const token = localStorage.getItem("token");
-      await axios.delete(`${import.meta.env.VITE_API_URL}/jobs/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.delete(`/jobs/${id}`);
       toast.success("Job deleted");
       navigate("/dashboard/recruiter");
     } catch (err) {
@@ -292,7 +281,7 @@ export function JobManagePage() {
                       <div className="col-span-1 md:col-span-3 flex items-center gap-4">
                         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#3b82f6]/20 to-[#8b5cf6]/20 flex items-center justify-center border border-white/10 overflow-hidden shadow-sm">
                           {applicant.profile_image ? (
-                            <img src={`${import.meta.env.VITE_API_URL}${applicant.profile_image}`} alt={applicant.full_name} className="w-full h-full object-cover" />
+                            <img src={getAssetUrl(applicant.profile_image)} alt={applicant.full_name} className="w-full h-full object-cover" />
                           ) : (
                             <Users className="w-5 h-5 text-[#3b82f6]" />
                           )}
@@ -326,7 +315,7 @@ export function JobManagePage() {
                       <div className="col-span-1 md:col-span-3 flex items-center justify-end gap-2" onClick={(e) => e.stopPropagation()}>
                         {applicant.resume_url && (
                           <a 
-                            href={`${import.meta.env.VITE_API_URL}${applicant.resume_url}`} 
+                            href={getAssetUrl(applicant.resume_url)} 
                             target="_blank" 
                             rel="noreferrer"
                             className="p-2 rounded-xl bg-white/5 border border-white/10 text-white/40 hover:text-[#3b82f6] hover:border-[#3b82f6]/50 transition-all"
