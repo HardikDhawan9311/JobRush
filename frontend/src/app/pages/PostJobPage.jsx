@@ -39,7 +39,7 @@ export function PostJobPage() {
     setFetching(true);
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get(`http://localhost:5001/jobs/${editId}`, {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/jobs/${editId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const job = res.data;
@@ -71,13 +71,13 @@ export function PostJobPage() {
     try {
       const token = localStorage.getItem("token");
       if (editId) {
-        await axios.put(`http://localhost:5001/jobs/${editId}`, formData, {
+        await axios.put(`${import.meta.env.VITE_API_URL}/jobs/${editId}`, formData, {
           headers: { Authorization: `Bearer ${token}` }
         });
         toast.success("Job updated successfully!");
         navigate(`/dashboard/recruiter/jobs/${editId}`);
       } else {
-        await axios.post("http://localhost:5001/jobs", formData, {
+        await axios.post(`${import.meta.env.VITE_API_URL}/jobs`, formData, {
           headers: { Authorization: `Bearer ${token}` }
         });
         toast.success("Job posted successfully!");

@@ -25,7 +25,7 @@ export function JobListingPage() {
   const fetchJobs = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5001/jobs/all", {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/jobs/all`, {
         params: {
           title: searchQuery,
           location: locationQuery,
@@ -47,7 +47,7 @@ export function JobListingPage() {
   const fetchSavedJobs = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5001/jobs/saved", {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/jobs/saved`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setSavedJobs(new Set(res.data.map(job => job.id)));
@@ -59,7 +59,7 @@ export function JobListingPage() {
   const handleSave = async (jobId) => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.post(`http://localhost:5001/jobs/${jobId}/save`, {}, {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/jobs/${jobId}/save`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       

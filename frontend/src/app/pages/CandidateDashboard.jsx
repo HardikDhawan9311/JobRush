@@ -18,7 +18,7 @@ export function CandidateDashboard() {
   const fetchUserData = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5001/user/profile", {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/user/profile`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setUser(res.data);
@@ -30,7 +30,7 @@ export function CandidateDashboard() {
   const fetchApplications = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5001/jobs/applications", {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/jobs/applications`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setApplications(res.data);

@@ -27,7 +27,7 @@ export function JobManagePage() {
   const fetchJobDetails = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get(`http://localhost:5001/jobs/${id}`, {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/jobs/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setJob(res.data);
@@ -40,7 +40,7 @@ export function JobManagePage() {
   const fetchApplicants = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get(`http://localhost:5001/jobs/${id}/applicants`, {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/jobs/${id}/applicants`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setApplicants(res.data);
@@ -54,7 +54,7 @@ export function JobManagePage() {
   const handleUpdateStatus = async (applicationId, newStatus) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.put(`http://localhost:5001/jobs/applications/${applicationId}/status`, 
+      await axios.put(`${import.meta.env.VITE_API_URL}/jobs/applications/${applicationId}/status`, 
         { status: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -79,7 +79,7 @@ export function JobManagePage() {
       a.email,
       a.location || "N/A",
       a.status,
-      a.resume_url ? `http://localhost:5001${a.resume_url}` : "N/A"
+      a.resume_url ? `${import.meta.env.VITE_API_URL}${a.resume_url}` : "N/A"
     ]);
 
     const csvContent = [
@@ -101,7 +101,7 @@ export function JobManagePage() {
     if (!window.confirm("Are you sure you want to delete this job? This action cannot be undone.")) return;
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:5001/jobs/${id}`, {
+      await axios.delete(`${import.meta.env.VITE_API_URL}/jobs/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success("Job deleted");
@@ -292,7 +292,7 @@ export function JobManagePage() {
                       <div className="col-span-1 md:col-span-3 flex items-center gap-4">
                         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#3b82f6]/20 to-[#8b5cf6]/20 flex items-center justify-center border border-white/10 overflow-hidden shadow-sm">
                           {applicant.profile_image ? (
-                            <img src={`http://localhost:5001${applicant.profile_image}`} alt={applicant.full_name} className="w-full h-full object-cover" />
+                            <img src={`${import.meta.env.VITE_API_URL}${applicant.profile_image}`} alt={applicant.full_name} className="w-full h-full object-cover" />
                           ) : (
                             <Users className="w-5 h-5 text-[#3b82f6]" />
                           )}
@@ -326,7 +326,7 @@ export function JobManagePage() {
                       <div className="col-span-1 md:col-span-3 flex items-center justify-end gap-2" onClick={(e) => e.stopPropagation()}>
                         {applicant.resume_url && (
                           <a 
-                            href={`http://localhost:5001${applicant.resume_url}`} 
+                            href={`${import.meta.env.VITE_API_URL}${applicant.resume_url}`} 
                             target="_blank" 
                             rel="noreferrer"
                             className="p-2 rounded-xl bg-white/5 border border-white/10 text-white/40 hover:text-[#3b82f6] hover:border-[#3b82f6]/50 transition-all"

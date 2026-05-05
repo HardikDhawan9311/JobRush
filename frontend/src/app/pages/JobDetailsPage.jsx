@@ -21,7 +21,7 @@ export function JobDetailsPage() {
   const fetchJobDetails = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get(`http://localhost:5001/jobs/${id}`, {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/jobs/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setJob(res.data);
@@ -36,7 +36,7 @@ export function JobDetailsPage() {
   const fetchUserProfile = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5001/user/profile", {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/user/profile`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setUser(res.data);
@@ -55,7 +55,7 @@ export function JobDetailsPage() {
     setApplying(true);
     try {
       const token = localStorage.getItem("token");
-      await axios.post(`http://localhost:5001/jobs/${id}/apply`, {}, {
+      await axios.post(`${import.meta.env.VITE_API_URL}/jobs/${id}/apply`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setJob(prev => ({ ...prev, hasApplied: true }));

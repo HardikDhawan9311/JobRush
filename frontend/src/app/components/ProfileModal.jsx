@@ -26,7 +26,7 @@ export function ProfileModal({ isOpen, onClose, onUpdate }) {
   const fetchProfile = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5001/user/profile", {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/user/profile`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setFormData({
@@ -59,7 +59,7 @@ export function ProfileModal({ isOpen, onClose, onUpdate }) {
 
     try {
       const token = localStorage.getItem("token");
-      await axios.put("http://localhost:5001/user/profile", data, {
+      await axios.put(`${import.meta.env.VITE_API_URL}/user/profile`, data, {
         headers: { 
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data"

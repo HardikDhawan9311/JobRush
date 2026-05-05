@@ -12,7 +12,7 @@ export function JobDetailsModal({ job, applicants, isOpen, onClose, onStatusUpda
     try {
       const token = localStorage.getItem("token");
       // Note: We need to create this endpoint in the backend if we want it to work
-      await axios.put(`http://localhost:5001/jobs/applications/${applicationId}/status`, 
+      await axios.put(`${import.meta.env.VITE_API_URL}/jobs/applications/${applicationId}/status`, 
         { status: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -158,7 +158,7 @@ export function JobDetailsModal({ job, applicants, isOpen, onClose, onStatusUpda
                         <div className="flex items-center gap-4 mb-4">
                           <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#3b82f6]/20 to-[#ef4444]/20 flex items-center justify-center border border-white/10 overflow-hidden">
                             {applicant.profile_image ? (
-                              <img src={`http://localhost:5001${applicant.profile_image}`} alt={applicant.full_name} className="w-full h-full object-cover" />
+                              <img src={`${import.meta.env.VITE_API_URL}${applicant.profile_image}`} alt={applicant.full_name} className="w-full h-full object-cover" />
                             ) : (
                               <Users className="w-6 h-6 text-[#3b82f6]" />
                             )}
@@ -185,7 +185,7 @@ export function JobDetailsModal({ job, applicants, isOpen, onClose, onStatusUpda
                         <div className="flex gap-2">
                           {applicant.resume_url ? (
                             <a 
-                              href={`http://localhost:5001${applicant.resume_url}`} 
+                              href={`${import.meta.env.VITE_API_URL}${applicant.resume_url}`} 
                               target="_blank" 
                               rel="noreferrer"
                               className="flex-1 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-medium flex items-center justify-center gap-2 transition-all"

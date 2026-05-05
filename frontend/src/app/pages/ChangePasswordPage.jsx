@@ -17,7 +17,7 @@ export function ChangePasswordPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post("http://localhost:5001/auth/send-otp", { email });
+      await axios.post(`${import.meta.env.VITE_API_URL}/auth/send-otp`, { email });
       toast.success("OTP sent to your email!");
       setStep(2);
     } catch (err) {
@@ -38,7 +38,7 @@ export function ChangePasswordPage() {
 
     setLoading(true);
     try {
-      await axios.post("http://localhost:5001/auth/update-password", {
+      await axios.post(`${import.meta.env.VITE_API_URL}/auth/update-password`, {
         email,
         otp,
         newPassword

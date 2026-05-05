@@ -22,7 +22,7 @@ export function CandidateProfilePage() {
   const fetchCandidateProfile = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get(`http://localhost:5001/user/profile/${id}`, {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/user/profile/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setCandidate(res.data);
@@ -62,7 +62,7 @@ export function CandidateProfilePage() {
               <div className="flex flex-col items-center text-center">
                 <div className="w-32 h-32 rounded-3xl bg-gradient-to-br from-[#3b82f6]/20 to-[#ef4444]/20 flex items-center justify-center mb-6 border border-white/10 overflow-hidden shadow-2xl">
                   {candidate.profile_image ? (
-                    <img src={`http://localhost:5001${candidate.profile_image}`} alt={candidate.full_name} className="w-full h-full object-cover" />
+                    <img src={`${import.meta.env.VITE_API_URL}${candidate.profile_image}`} alt={candidate.full_name} className="w-full h-full object-cover" />
                   ) : (
                     <User className="w-12 h-12 text-[#3b82f6]" />
                   )}
@@ -94,7 +94,7 @@ export function CandidateProfilePage() {
                   Documents
                 </h3>
                 <a 
-                  href={`http://localhost:5001${candidate.resume_url}`} 
+                  href={`${import.meta.env.VITE_API_URL}${candidate.resume_url}`} 
                   target="_blank" 
                   rel="noreferrer"
                   className="w-full p-4 rounded-2xl bg-[#3b82f6] text-white flex items-center justify-center gap-3 hover:shadow-lg hover:shadow-[#3b82f6]/30 transition-all font-bold"

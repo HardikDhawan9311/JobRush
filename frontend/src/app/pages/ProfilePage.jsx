@@ -47,7 +47,7 @@ export function ProfilePage() {
   const fetchProfile = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5001/user/profile", {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/user/profile`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       updateUser(res.data);
@@ -64,7 +64,7 @@ export function ProfilePage() {
         company_logo: res.data.company_logo || ""
       });
       if (res.data.company_logo) {
-        setCompanyLogoPreview(`http://localhost:5001${res.data.company_logo}`);
+        setCompanyLogoPreview(`${import.meta.env.VITE_API_URL}${res.data.company_logo}`);
       }
     } catch (err) {
       console.error("Error fetching profile:", err);
@@ -96,7 +96,7 @@ export function ProfilePage() {
 
     try {
       const token = localStorage.getItem("token");
-      await axios.put("http://localhost:5001/user/profile", data, {
+      await axios.put(`${import.meta.env.VITE_API_URL}/user/profile`, data, {
         headers: { 
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data"
@@ -145,7 +145,7 @@ export function ProfilePage() {
                 {previewImage ? (
                   <img src={previewImage} alt="Profile" className="w-full h-full object-cover" />
                 ) : user.profile_image ? (
-                  <img src={`http://localhost:5001${user.profile_image}`} alt="Profile" className="w-full h-full object-cover" />
+                  <img src={`${import.meta.env.VITE_API_URL}${user.profile_image}`} alt="Profile" className="w-full h-full object-cover" />
                 ) : (
                   <User className="w-16 h-16 text-white/20" />
                 )}
@@ -198,7 +198,7 @@ export function ProfilePage() {
                         <span className="text-sm font-medium">My_Resume.pdf</span>
                       </div>
                       <a 
-                        href={`http://localhost:5001${user.resume_url}`} 
+                        href={`${import.meta.env.VITE_API_URL}${user.resume_url}`} 
                         target="_blank" 
                         rel="noopener noreferrer"
                         className="text-[#3b82f6] hover:underline text-sm"

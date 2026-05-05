@@ -20,7 +20,7 @@ export function MyApplicationsPage() {
   const fetchApplications = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5001/jobs/applications", {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/jobs/applications`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setApplications(res.data);

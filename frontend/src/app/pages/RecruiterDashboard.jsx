@@ -24,7 +24,7 @@ export function RecruiterDashboard() {
   const fetchRecruiterData = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5001/user/profile", {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/user/profile`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setUser(res.data);
@@ -36,7 +36,7 @@ export function RecruiterDashboard() {
   const fetchJobs = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5001/jobs/recruiter", {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/jobs/recruiter`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setJobs(res.data);
@@ -48,7 +48,7 @@ export function RecruiterDashboard() {
   const fetchStats = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5001/jobs/stats", {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/jobs/stats`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setStatsData(res.data);
@@ -65,7 +65,7 @@ export function RecruiterDashboard() {
     if (!window.confirm("Are you sure you want to delete this job?")) return;
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:5001/jobs/${id}`, {
+      await axios.delete(`${import.meta.env.VITE_API_URL}/jobs/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success("Job deleted");

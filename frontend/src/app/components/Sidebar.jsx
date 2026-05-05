@@ -24,7 +24,7 @@ export function Sidebar() {
       try {
         const token = localStorage.getItem("token");
         if (!token) return;
-        const res = await axios.get("http://localhost:5001/user/profile", {
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/user/profile`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         updateUser(res.data);
@@ -91,7 +91,7 @@ export function Sidebar() {
           <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/10">
             <div className="w-10 h-10 rounded-full bg-[#3b82f6]/20 flex items-center justify-center overflow-hidden border border-[#3b82f6]/30">
               {user.profile_image ? (
-                <img src={`http://localhost:5001${user.profile_image}`} alt="Avatar" className="w-full h-full object-cover" />
+                <img src={`${import.meta.env.VITE_API_URL}${user.profile_image}`} alt="Avatar" className="w-full h-full object-cover" />
               ) : (
                 <User className="w-5 h-5 text-[#3b82f6]" />
               )}
