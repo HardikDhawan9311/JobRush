@@ -190,82 +190,6 @@ exports.getJobApplicants = async (req, res) => {
   }
 };
 
-// Update application status
-exports.updateApplicationStatus = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { status } = req.body;
-    const recruiter_id = req.user.id;
-
-    // Fetch candidate and job details for the email
-    const [details] = await db.query(
-      `SELECT u.email, u.full_name, j.title, j.company_name 
-       FROM applications a
-       JOIN users u ON a.candidate_id = u.id
-       JOIN jobs j ON a.job_id = j.id
-       WHERE a.id = ?`,
-      [id]
-    );
-
-    const info = details[0];
-
-    await db.query('UPDATE applications SET status = ? WHERE id = ?', [status, id]);
-
-    // Send status update email
-    if (info) {
-      let subject = '';
-      let message = '';
-
-      if (status === 'shortlisted') {
-        subject = `Good News! You've been Shortlisted for ${info.title}`;
-        message = `
-          Dear ${info.full_name},<br><br>
-          We are pleased to inform you that you have been <strong>shortlisted</strong> for the position of <strong>${info.title}</strong> at <strong>${info.company_name}</strong>.<br><br>
-          The recruiter will contact you shortly regarding the next steps in the interview process.<br><br>
-          Best of luck!<br><br>
-          Team JobRush
-        `;
-      } else if (status === 'hired') {
-        subject = `Congratulations! You're Hired at ${info.company_name}`;
-        message = `
-          Dear ${info.full_name},<br><br>
-          We are thrilled to inform you that you have been <strong>selected</strong> for the position of <strong>${info.title}</strong> at <strong>${info.company_name}</strong>!<br><br>
-          Congratulations on your new role. The HR team will reach out to you with the official offer letter and onboarding details.<br><br>
-          Welcome aboard!<br><br>
-          Team JobRush
-        `;
-      } else if (status === 'rejected') {
-        subject = `Update on your application for ${info.title}`;
-        message = `
-          Dear ${info.full_name},<br><br>
-          Thank you for your interest in the <strong>${info.title}</strong> position at <strong>${info.company_name}</strong>.<br><br>
-          After careful consideration, we regret to inform you that we will not be moving forward with your application at this time.<br><br>
-          We appreciate the time and effort you put into your application and wish you the very best in your job search.<br><br>
-          Best regards,<br><br>
-          Team JobRush
-        `;
-      }
-
-      if (subject && message) {
-        try {
-          await sendEmail({
-            email: info.email,
-            subject,
-            message
-          });
-        } catch (emailErr) {
-          console.error('Status update email failed:', emailErr);
-        }
-      }
-    }
-
-    res.status(200).json({ message: `Application marked as ${status}` });
-  } catch (err) {
-    console.error('Update Status Error:', err);
-    res.status(500).json({ message: 'Server error updating status' });
-  }
-};
-
 // Update a job
 exports.updateJob = async (req, res) => {
   try {
@@ -493,6 +417,7 @@ exports.getSavedJobs = async (req, res) => {
     res.status(500).json({ message: 'Server error fetching saved jobs' });
   }
 };
+
 // Update application status
 exports.updateApplicationStatus = async (req, res) => {
   try {
@@ -546,5 +471,29 @@ exports.updateApplicationStatus = async (req, res) => {
   } catch (err) {
     console.error('Update Status Error:', err);
     res.status(500).json({ message: 'Server error updating status' });
+  }
+};
+
+// Get Top 3 Jobs (Public - First 3 Created)
+exports.getTopJobs = async (req, res) => {
+  try {
+    const [jobs] = await db.query(`
+      SELECT j.*, u.company_logo
+      FROM jobs j
+      LEFT JOIN users u ON j.recruiter_id = u.id
+      ORDER BY j.posted_at ASC
+      LIMIT 3
+    `);
+
+    // Format tags if needed (converting skills_required to array)
+    const formattedJobs = jobs.map(job => ({
+      ...job,
+      tags: job.skills_required ? job.skills_required.split(',').slice(0, 3).map(s => s.trim()) : []
+    }));
+
+    res.status(200).json(formattedJobs);
+  } catch (err) {
+    console.error('Get Top Jobs Error:', err);
+    res.status(500).json({ message: 'Server error fetching top jobs' });
   }
 };

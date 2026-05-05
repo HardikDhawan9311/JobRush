@@ -1,9 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const { createJob, getRecruiterJobs, deleteJob, getRecruiterStats, getJobDetails, getJobApplicants, updateJob, getAllJobs, applyForJob, getCandidateApplications, toggleSaveJob, getSavedJobs } = require('../controllers/jobController');
+const { createJob, getRecruiterJobs, deleteJob, getRecruiterStats, getJobDetails, getJobApplicants, updateJob, getAllJobs, applyForJob, getCandidateApplications, toggleSaveJob, getSavedJobs, getTopJobs, updateApplicationStatus } = require('../controllers/jobController');
 const authenticate = require('../middlewares/authMiddleware');
 
-// All job routes require authentication
+// Public routes
+// @route   GET /jobs/top
+router.get('/top', getTopJobs);
+
+// All other job routes require authentication
 router.use(authenticate);
 
 // @route   GET /jobs/saved
@@ -43,6 +47,6 @@ router.get('/:id', getJobDetails);
 router.get('/:id/applicants', getJobApplicants);
 
 // @route   PUT /jobs/applications/:id/status
-router.put('/applications/:id/status', require('../controllers/jobController').updateApplicationStatus);
+router.put('/applications/:id/status', updateApplicationStatus);
 
 module.exports = router;

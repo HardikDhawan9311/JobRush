@@ -1,37 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router";
 import { Search, MapPin, Rocket, TrendingUp, Users, Zap, Code, Palette, DollarSign, Megaphone, ArrowRight, Sparkles, Globe, ShieldCheck } from "lucide-react";
 import { JobCard } from "../components/JobCard";
-
-const featuredJobs = [
-  {
-    id: "1",
-    title: "Senior React Developer",
-    company: "TechCorp Inc",
-    location: "Remote",
-    salary: "$120k - $180k",
-    type: "Full-time",
-    tags: ["Remote", "React", "TypeScript"]
-  },
-  {
-    id: "2",
-    title: "UI/UX Designer",
-    company: "DesignHub",
-    location: "San Francisco, CA",
-    salary: "$90k - $130k",
-    type: "Full-time",
-    tags: ["Figma", "Design Systems"]
-  },
-  {
-    id: "3",
-    title: "Product Manager",
-    company: "StartupX",
-    location: "New York, NY",
-    salary: "$140k - $200k",
-    type: "Full-time",
-    tags: ["SaaS", "B2B"]
-  }
-];
+import { useUser } from "../context/UserContext";
+import api from "../utils/api";
 
 const categories = [
   { name: "Development", icon: Code, count: "2,450 jobs", color: "#3b82f6", size: "large" },
@@ -41,9 +13,60 @@ const categories = [
 ];
 
 export function LandingPage() {
+  const { user } = useUser();
   const [jobTitle, setJobTitle] = useState("");
-  const [location, setLocation] = useState("");
   const [savedJobs, setSavedJobs] = useState(new Set());
+  const [featuredJobs, setFeaturedJobs] = useState([]);
+  const [jobsLoading, setJobsLoading] = useState(true);
+
+  const isRecruiter = user?.role === 'recruiter';
+  const isCandidate = user?.role === 'candidate';
+  const isLoggedIn = !!user;
+
+  useEffect(() => {
+    fetchTopJobs();
+  }, []);
+
+  const fetchTopJobs = async () => {
+    try {
+      const res = await api.get("/jobs/top");
+      setFeaturedJobs(res.data);
+    } catch (err) {
+      console.error("Error fetching top jobs:", err);
+    } finally {
+      setJobsLoading(false);
+    }
+  };
+
+  // Content configuration based on role
+  const content = {
+    hero: {
+      tag: isLoggedIn ? `Welcome back, ${user.full_name}` : "The Future of Recruitment is Here",
+      title: isRecruiter ? (
+        <>Hire the <span className="text-gradient">Best Talent</span> <br /> Faster Than Ever</>
+      ) : isCandidate ? (
+        <>Discover Your <br /> <span className="text-gradient">Dream Career</span></>
+      ) : (
+        <>Elevate Your <br /> <span className="text-gradient">Career Path</span></>
+      ),
+      desc: isRecruiter 
+        ? "Post jobs, manage applicants, and build your dream team with our intelligent recruitment tools."
+        : isCandidate 
+        ? "Track your applications, save interesting roles, and connect with top-tier companies globally."
+        : "Beyond just job listings. We provide a curated ecosystem for top talent to connect with industry-defining companies.",
+      buttonText: isRecruiter ? "Post a New Job" : isCandidate ? "View My Dashboard" : "Explore Jobs",
+      buttonLink: isRecruiter ? "/dashboard/recruiter" : isCandidate ? "/dashboard/candidate" : "/jobs",
+      secondaryText: isRecruiter ? "Manage Applicants" : isCandidate ? "Track Applications" : "Join as Recruiter",
+      secondaryLink: isRecruiter ? "/dashboard/recruiter" : isCandidate ? "/applications" : "/signup?role=recruiter"
+    },
+    cta: {
+      title: isRecruiter ? "Ready to grow your team?" : isCandidate ? "Your next big move awaits." : "Ready to redefine your future?",
+      primaryBtn: isRecruiter ? "Go to Dashboard" : isCandidate ? "Explore Jobs" : "Get Started Now",
+      primaryLink: isRecruiter ? "/dashboard/recruiter" : isCandidate ? "/jobs" : "/signup",
+      secondaryBtn: isRecruiter ? "View Postings" : isCandidate ? "My Profile" : "Browse Roles",
+      secondaryLink: isRecruiter ? "/dashboard/recruiter" : isCandidate ? "/profile" : "/jobs"
+    }
+  };
 
   const handleSave = (jobId) => {
     setSavedJobs(prev => {
@@ -76,41 +99,59 @@ export function LandingPage() {
             <div className="text-left">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.03] border border-white/10 mb-8 animate-bounce-slow">
                 <Sparkles className="w-4 h-4 text-[#3b82f6]" />
-                <span className="text-sm font-medium text-[#3b82f6]">The Future of Recruitment is Here</span>
+                <span className="text-sm font-medium text-[#3b82f6]">{content.hero.tag}</span>
               </div>
               
               <h1 className="text-5xl sm:text-6xl md:text-8xl font-extrabold text-white mb-8 leading-[1.1]" style={{ fontFamily: 'var(--font-heading)' }}>
-                Elevate Your <br />
-                <span className="text-gradient">Career Path</span>
+                {content.hero.title}
               </h1>
               
               <p className="text-lg md:text-xl text-white/60 mb-10 max-w-xl leading-relaxed">
-                Beyond just job listings. We provide a curated ecosystem for top talent to connect with industry-defining companies.
+                {content.hero.desc}
               </p>
 
-              {/* Unique Floating Search Bar */}
-              <div className="max-w-xl p-2 rounded-2xl bg-white/[0.03] border border-white/10 relative group">
-                <div className="absolute inset-0 bg-[#3b82f6]/10 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl" />
-                <div className="relative flex flex-col sm:flex-row items-stretch gap-2">
-                  <div className="flex-1 flex items-center gap-3 px-4 py-3 rounded-xl bg-white/5 border border-white/5 focus-within:border-[#3b82f6]/50 transition-all">
-                    <Search className="w-5 h-5 text-[#3b82f6]" />
-                    <input
-                      type="text"
-                      placeholder="Role or skill"
-                      value={jobTitle}
-                      onChange={(e) => setJobTitle(e.target.value)}
-                      className="flex-1 bg-transparent outline-none text-white placeholder-white/40 text-sm"
-                    />
-                  </div>
-                  <Link
-                    to="/jobs"
-                    className="px-8 py-3 rounded-xl bg-[#3b82f6] hover:bg-[#2563eb] transition-all flex items-center justify-center gap-2 font-bold shadow-lg shadow-[#3b82f6]/20 group/btn"
-                  >
-                    <span>Explore Jobs</span>
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </Link>
-                </div>
+              {/* Dynamic Buttons */}
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 mb-10">
+                <Link
+                  to={content.hero.buttonLink}
+                  className="px-8 py-4 rounded-xl bg-[#3b82f6] hover:bg-[#2563eb] transition-all flex items-center justify-center gap-2 font-bold shadow-lg shadow-[#3b82f6]/20 group/btn"
+                >
+                  <span>{content.hero.buttonText}</span>
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </Link>
+                
+                <Link
+                  to={content.hero.secondaryLink}
+                  className="px-8 py-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all flex items-center justify-center gap-2 font-bold"
+                >
+                  {content.hero.secondaryText}
+                </Link>
               </div>
+
+              {/* Unique Floating Search Bar (Only for non-recruiters) */}
+              {!isRecruiter && (
+                <div className="max-w-xl p-2 rounded-2xl bg-white/[0.03] border border-white/10 relative group mb-8">
+                  <div className="absolute inset-0 bg-[#3b82f6]/10 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl" />
+                  <div className="relative flex flex-col sm:flex-row items-stretch gap-2">
+                    <div className="flex-1 flex items-center gap-3 px-4 py-3 rounded-xl bg-white/5 border border-white/5 focus-within:border-[#3b82f6]/50 transition-all">
+                      <Search className="w-5 h-5 text-[#3b82f6]" />
+                      <input
+                        type="text"
+                        placeholder="Role or skill"
+                        value={jobTitle}
+                        onChange={(e) => setJobTitle(e.target.value)}
+                        className="flex-1 bg-transparent outline-none text-white placeholder-white/40 text-sm"
+                      />
+                    </div>
+                    <Link
+                      to="/jobs"
+                      className="px-8 py-3 rounded-xl bg-white/10 hover:bg-white/20 transition-all flex items-center justify-center gap-2 font-bold border border-white/10"
+                    >
+                      <span>Quick Search</span>
+                    </Link>
+                  </div>
+                </div>
+              )}
 
               <div className="flex items-center gap-8 mt-12 opacity-80">
                 <div className="flex -space-x-3">
@@ -208,19 +249,36 @@ export function LandingPage() {
               Curated <span className="text-[#10b981]">Opportunities</span>
             </h2>
             <p className="text-white/40 max-w-2xl mx-auto">
-              Our algorithm selects only the highest-quality roles from certified employers.
+              Our latest curated roles from verified employers, specifically selected for your professional growth.
             </p>
           </div>
 
           <div className="grid gap-6">
-            {featuredJobs.map((job) => (
-              <JobCard
-                key={job.id}
-                {...job}
-                isSaved={savedJobs.has(job.id)}
-                onSave={() => handleSave(job.id)}
-              />
-            ))}
+            {jobsLoading ? (
+              <div className="text-center py-20">
+                <div className="w-12 h-12 border-4 border-[#3b82f6] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                <p className="text-white/40">Loading curated roles...</p>
+              </div>
+            ) : featuredJobs.length > 0 ? (
+              featuredJobs.map((job) => (
+                <JobCard
+                  key={job.id}
+                  id={job.id}
+                  title={job.title}
+                  company={job.company_name}
+                  location={job.location}
+                  salary={`${job.salary_min}k - ${job.salary_max}k`}
+                  type={job.job_type}
+                  tags={job.tags}
+                  isSaved={savedJobs.has(job.id)}
+                  onSave={() => handleSave(job.id)}
+                />
+              ))
+            ) : (
+              <div className="text-center py-20 rounded-[2rem] bg-white/5 border border-white/10">
+                <p className="text-white/40">No curated opportunities available at the moment.</p>
+              </div>
+            )}
           </div>
 
           <div className="mt-16 text-center">
@@ -261,14 +319,14 @@ export function LandingPage() {
             
             <div className="relative z-10">
               <h2 className="text-4xl md:text-6xl font-extrabold text-white mb-8" style={{ fontFamily: 'var(--font-heading)' }}>
-                Ready to redefine <br /> your future?
+                {content.cta.title}
               </h2>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link to="/signup" className="px-10 py-4 rounded-2xl bg-[#0a0b14] text-white font-bold hover:scale-105 transition-transform shadow-2xl">
-                  Get Started Now
+                <Link to={content.cta.primaryLink} className="px-10 py-4 rounded-2xl bg-[#0a0b14] text-white font-bold hover:scale-105 transition-transform shadow-2xl">
+                  {content.cta.primaryBtn}
                 </Link>
-                <Link to="/jobs" className="px-10 py-4 rounded-2xl bg-white/20 backdrop-blur-md text-white font-bold hover:bg-white/30 transition-all border border-white/20">
-                  Browse Roles
+                <Link to={content.cta.secondaryLink} className="px-10 py-4 rounded-2xl bg-white/20 backdrop-blur-md text-white font-bold hover:bg-white/30 transition-all border border-white/20">
+                  {content.cta.secondaryBtn}
                 </Link>
               </div>
             </div>

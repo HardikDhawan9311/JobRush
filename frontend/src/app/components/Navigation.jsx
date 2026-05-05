@@ -2,16 +2,19 @@ import { Link, useLocation, useNavigate } from "react-router";
 import { Briefcase, User, Heart, LogIn, LogOut } from "lucide-react";
 import { toast } from "sonner";
 
+import { useUser } from "../context/UserContext";
+
 export function Navigation() {
   const location = useLocation();
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user") || "null");
+  const { user, updateUser } = useUser();
 
   const isActive = (path) => location.pathname === path;
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    updateUser(null);
     toast.success("Logged out successfully");
     navigate("/login");
   };
@@ -32,26 +35,43 @@ export function Navigation() {
           </Link>
 
           <div className="flex items-center gap-6">
-            <Link
-              to="/jobs"
-              className={`px-4 py-2 rounded-lg transition-all ${
-                isActive('/jobs')
-                  ? 'bg-[#3b82f6]/20 text-[#3b82f6]'
-                  : 'hover:bg-white/5'
-              }`}
-            >
-              Find Jobs
-            </Link>
-            <Link
-              to="/saved"
-              className={`px-4 py-2 rounded-lg transition-all ${
-                isActive('/saved')
-                  ? 'bg-[#3b82f6]/20 text-[#3b82f6]'
-                  : 'hover:bg-white/5'
-              }`}
-            >
-              Saved Jobs
-            </Link>
+            {user?.role !== 'recruiter' && (
+              <>
+                <Link
+                  to="/jobs"
+                  className={`px-4 py-2 rounded-lg transition-all ${
+                    isActive('/jobs')
+                      ? 'bg-[#3b82f6]/20 text-[#3b82f6]'
+                      : 'hover:bg-white/5'
+                  }`}
+                >
+                  Find Jobs
+                </Link>
+                <Link
+                  to="/saved"
+                  className={`px-4 py-2 rounded-lg transition-all ${
+                    isActive('/saved')
+                      ? 'bg-[#3b82f6]/20 text-[#3b82f6]'
+                      : 'hover:bg-white/5'
+                  }`}
+                >
+                  Saved Jobs
+                </Link>
+              </>
+            )}
+
+            {user?.role === 'recruiter' && (
+              <Link
+                to="/dashboard/recruiter"
+                className={`px-4 py-2 rounded-lg transition-all ${
+                  isActive('/dashboard/recruiter')
+                    ? 'bg-[#3b82f6]/20 text-[#3b82f6]'
+                    : 'hover:bg-white/5'
+                }`}
+              >
+                Postings
+              </Link>
+            )}
 
             {user ? (
               <>

@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router";
 import { Mail, Lock, User, Briefcase, Users, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import api from "../utils/api";
@@ -7,13 +7,21 @@ import api from "../utils/api";
 
 export function SignupPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [otp, setOtp] = useState("");
-  const [role, setRole] = useState("candidate");
+  const [role, setRole] = useState(searchParams.get("role") || "candidate");
   const [showOTP, setShowOTP] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const roleParam = searchParams.get("role");
+    if (roleParam && (roleParam === "candidate" || roleParam === "recruiter")) {
+      setRole(roleParam);
+    }
+  }, [searchParams]);
 
   const handleSendOTP = async () => {
     if (!email) {
